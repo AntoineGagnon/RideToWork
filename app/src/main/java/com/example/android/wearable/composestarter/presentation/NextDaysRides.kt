@@ -2,10 +2,7 @@ package com.example.android.wearable.composestarter.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -31,7 +28,7 @@ fun NextDaysRides(
     navigationController: NavController,
     weatherViewModel: WeatherViewModel = viewModel()
 ) {
-    val nextDaysWeather by weatherViewModel.nextDaysWeather.collectAsState(emptyMap())
+    val nextDaysWeather by weatherViewModel.nextDaysWeather.collectAsState(emptyList())
     WearAppTheme {
         ScalingLazyColumn(
             modifier = Modifier
@@ -40,34 +37,45 @@ fun NextDaysRides(
                 .selectableGroup(),
             verticalArrangement = Arrangement.Center
         ) {
-            items(nextDaysWeather.entries.drop(1)) {
-                val day = it.key
-                val weatherInfo = it.value
-                Chip(
-                    label = {
-                        Text(day.name + day.number)
-                    },
-                    colors = ChipDefaults.imageBackgroundChipColors(
-                        backgroundImagePainter = ColorPainter(weatherInfo.statusColor())
-                    ),
-                    icon = {
-                        Box(
-                            Modifier
-                                .size(ChipDefaults.LargeIconSize)
-                                .clip(CircleShape)
-                                .border(0.5.dp, Color.White, CircleShape)
-                        ) {
-                            WeatherAnimation(weatherInfo.weatherIssue)
-                        }
-                    },
-
-                    onClick = {
-                        // TODO Chips to Cards
-                    }
-                )
+            items(nextDaysWeather) { weatherInfo ->
+                WeatherChip(weatherInfo)
             }
         }
     }
+}
+
+@Composable
+private fun WeatherChip(
+    weatherInfo: WeatherInfo
+) {
+    val day = weatherInfo.day
+    Chip(
+        label = {
+            Text("${day?.name.orEmpty()} ${day?.number ?: ""}")
+        },
+        secondaryLabel = {
+            Text("${weatherInfo.temperature}°C")
+        },
+        colors = ChipDefaults.imageBackgroundChipColors(
+            backgroundImagePainter = ColorPainter(weatherInfo.statusColor())
+        ),
+        icon = {
+            if (weatherInfo.weatherIssue != WeatherIssue.NONE) {
+                Box(
+                    Modifier
+                        .size(ChipDefaults.LargeIconSize)
+                        .clip(CircleShape)
+                        .border(0.5.dp, Color.White, CircleShape)
+                ) {
+                    WeatherAnimation(weatherInfo.weatherIssue)
+                }
+            }
+        },
+        onClick = {
+            // TODO Chips to Cards
+        },
+        modifier = Modifier.padding(top = 8.dp)
+    )
 }
 
 

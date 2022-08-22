@@ -1,17 +1,14 @@
 package com.example.android.wearable.composestarter.presentation
 
-import androidx.annotation.DrawableRes
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -20,25 +17,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.wear.compose.foundation.CurvedLayout
+import androidx.wear.compose.foundation.CurvedTextStyle
+import androidx.wear.compose.foundation.curvedRow
 import androidx.wear.compose.material.CircularProgressIndicator
-import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.curvedText
 import com.example.android.wearable.composestarter.presentation.theme.WearAppTheme
 import com.example.android.wearable.composestarter.presentation.ui.WeatherAnimation
 import com.example.android.wearable.composestarter.presentation.utils.onSwipeDown
 import com.example.android.wearable.composestarter.presentation.utils.statusColor
-import kotlinx.coroutines.delay
 
 
 @Composable
 fun TodayRide(navController: NavController, weatherViewModel: WeatherViewModel = viewModel()) {
-    val todayWeather: WeatherInfo by weatherViewModel.todayWeather.collectAsState(
-        initial = WeatherInfo(
-            CanRide.MAYBE,
-            WeatherIssue.NONE
-        )
-    )
+    val todayWeather: WeatherInfo? by weatherViewModel.todayWeather.collectAsState(initial =  null)
     val currentPage by weatherViewModel.dataLoadingStatus.collectAsState(initial = WeatherViewModel.Status.LOADING)
     WearAppTheme {
         Box(modifier = Modifier
@@ -54,7 +48,9 @@ fun TodayRide(navController: NavController, weatherViewModel: WeatherViewModel =
                         trackColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
                         strokeWidth = 4.dp
                     )
-                WeatherViewModel.Status.DONE -> WeatherIndicator(todayWeather)
+                WeatherViewModel.Status.DONE -> {
+                    todayWeather?.let { WeatherIndicator(it) }
+                }
             }
         }
     }
@@ -67,7 +63,7 @@ fun WeatherIndicator(weatherInfo: WeatherInfo) {
             .fillMaxSize()
             .background(color = weatherInfo.statusColor())
     ) {
-        if (weatherInfo.weatherIssue != WeatherIssue.NONE) {
+        if (weatherInfo.canRide != CanRide.YES && weatherInfo.weatherIssue != WeatherIssue.NONE) {
             WeatherAnimation(weatherInfo.weatherIssue)
         }
         Text(
@@ -80,10 +76,35 @@ fun WeatherIndicator(weatherInfo: WeatherInfo) {
             fontFamily = FontFamily.Monospace,
             fontSize = 30.sp
         )
+        TopText(weatherInfo.day?.name.orEmpty())
     }
 }
+
+@Composable
+fun TopText(text: String) {
+    if (LocalConfiguration.current.isScreenRound) {
+        CurvedLayout {
+            curvedRow {
+                curvedText(
+                    text = text,
+                    style = CurvedTextStyle()
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text)
+        }
+    }
+}
+
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true, showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    WeatherIndicator(WeatherInfo(CanRide.MAYBE, WeatherIssue.RAIN))
+    WeatherIndicator(WeatherInfo(null, CanRide.NO, WeatherIssue.RAIN, 10))
 }
