@@ -24,7 +24,6 @@ import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.curvedText
-import com.example.android.wearable.composestarter.presentation.theme.WearAppTheme
 import com.example.android.wearable.composestarter.presentation.ui.WeatherAnimation
 import com.example.android.wearable.composestarter.presentation.utils.onSwipeDown
 import com.example.android.wearable.composestarter.presentation.utils.statusColor
@@ -32,26 +31,23 @@ import com.example.android.wearable.composestarter.presentation.utils.statusColo
 
 @Composable
 fun TodayRide(navController: NavController, weatherViewModel: WeatherViewModel = viewModel()) {
-    val todayWeather: WeatherInfo? by weatherViewModel.todayWeather.collectAsState(initial =  null)
-    val currentPage by weatherViewModel.dataLoadingStatus.collectAsState(initial = WeatherViewModel.Status.LOADING)
-    WearAppTheme {
-        Box(modifier = Modifier
+    val todayWeather: DataState<WeatherInfo> by weatherViewModel.todayWeather.collectAsState(initial = DataState.Loading())
+    Box(
+        modifier = Modifier
             .fillMaxSize()
             .onSwipeDown {
                 navController.navigate(NavRoute.NEXT_DAYS_RIDE)
-            }) {
-            when (currentPage) {
-                WeatherViewModel.Status.LOADING ->
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        indicatorColor = MaterialTheme.colors.secondary,
-                        trackColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
-                        strokeWidth = 4.dp
-                    )
-                WeatherViewModel.Status.DONE -> {
-                    todayWeather?.let { WeatherIndicator(it) }
-                }
             }
+    ) {
+        if (todayWeather is DataState.Loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                indicatorColor = MaterialTheme.colors.secondary,
+                trackColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+                strokeWidth = 4.dp
+            )
+        } else {
+            WeatherIndicator((todayWeather as DataState.Data).data)
         }
     }
 }
@@ -63,7 +59,7 @@ fun WeatherIndicator(weatherInfo: WeatherInfo) {
             .fillMaxSize()
             .background(color = weatherInfo.statusColor())
     ) {
-        if (weatherInfo.canRide != CanRide.YES && weatherInfo.weatherIssue != WeatherIssue.NONE) {
+        if (weatherInfo.weatherIssue != WeatherIssue.NONE) {
             WeatherAnimation(weatherInfo.weatherIssue)
         }
         Text(
@@ -106,5 +102,5 @@ fun TopText(text: String) {
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true, showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    WeatherIndicator(WeatherInfo(null, CanRide.NO, WeatherIssue.RAIN, 10))
+    WeatherIndicator(WeatherInfo(null, CanRide.MAYBE, WeatherIssue.RAIN, 10))
 }

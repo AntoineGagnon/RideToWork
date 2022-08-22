@@ -1,11 +1,16 @@
 package com.example.android.wearable.composestarter.presentation.ui
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -15,7 +20,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
+import androidx.wear.compose.material.Icon
 import com.example.android.wearable.composestarter.R
 import com.example.android.wearable.composestarter.presentation.WeatherIssue
 import kotlin.random.Random
@@ -23,22 +28,51 @@ import kotlin.random.Random
 
 @Composable
 fun WeatherAnimation(weatherIssue: WeatherIssue) {
-    val numberOfDrops = 50
-    val imageId: Int
-    val color: Color
     when (weatherIssue) {
         WeatherIssue.RAIN -> {
-            imageId = R.drawable.ic_drop
-            color = Color(0xFF3b4e70)
+            FallingImageBackground(
+                numberOfDrops = 30,
+                imageId = R.drawable.ic_drop,
+                color = Color(0xFF4D8CFF)
+            )
         }
         WeatherIssue.SNOW -> {
-            imageId = R.drawable.ic_snow
-            color = Color.White
+            FallingImageBackground(
+                numberOfDrops = 20,
+                imageId = R.drawable.ic_snow,
+                color = Color.White
+            )
         }
         WeatherIssue.NONE -> {
-            return
+            RotatingIcon(
+                imageId = R.drawable.ic_sun,
+                color = Color.Yellow
+            )
         }
     }
+}
+
+@Composable
+fun RotatingIcon(@DrawableRes imageId: Int, color: Color) {
+    val rotationMultiplier by rememberInfiniteTransition().animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(2000, easing = LinearEasing))
+    )
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Icon(
+            modifier = Modifier
+                .fillMaxSize(0.60f)
+                .rotate(rotationMultiplier),
+            contentDescription = "Rotating sun icon",
+            imageVector = ImageVector.vectorResource(id = imageId),
+            tint = color
+        )
+    }
+}
+
+@Composable
+fun FallingImageBackground(numberOfDrops: Int, imageId: Int, color: Color) {
     val vector = ImageVector.vectorResource(id = imageId)
     val painter = rememberVectorPainter(image = vector)
     val animatedHeights: List<State<Float>> = buildList {
@@ -75,10 +109,10 @@ fun DrawScope.drawFallingImage(
     color: Color,
     height: State<Float>
 ) {
-    val iconSize = (size.width/10)
+    val iconSize = (size.width / 5)
     translate(x, (height.value * size.height)) {
         with(painter) {
-            draw(Size(iconSize,iconSize), colorFilter = ColorFilter.tint(color))
+            draw(Size(iconSize, iconSize), colorFilter = ColorFilter.tint(color))
         }
     }
 }

@@ -18,14 +18,7 @@ package com.example.android.wearable.composestarter.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -55,18 +48,7 @@ fun ContentView() {
             TodayRide(navController)
         }
         composable(NavRoute.NEXT_DAYS_RIDE) {
-            NextDaysRides(navController)
+            NextDaysRides()
         }
     }
 }
-
-@Composable
-fun MainText(shouldRideToWork: String) {
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colors.primary,
-        text = shouldRideToWork
-    )
-}
-
