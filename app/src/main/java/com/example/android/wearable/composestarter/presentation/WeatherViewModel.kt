@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class WeatherViewModel : ViewModel() {
-    private val random = Random(System.currentTimeMillis())
+    private val random = Random(5435432)
 
     val nextDaysWeather: Flow<List<WeatherInfo>> = flow {
         val days = DayOfWeek.values().toList()
-        Collections.rotate(days, 2)
+        Collections.rotate(days, 4)
         emit(
             days
                 .mapIndexed { index, dayOfWeek ->
@@ -25,9 +25,9 @@ class WeatherViewModel : ViewModel() {
                         WeatherIssue.NONE
                     ).random(random)
                     val temperature = if (weatherIssue == WeatherIssue.SNOW) {
-                        Random.nextInt(10, 25)
-                    } else {
                         Random.nextInt(-10, 5)
+                    } else {
+                        Random.nextInt(10, 25)
                     }
                     val canRide = if (weatherIssue == WeatherIssue.NONE) {
                         CanRide.YES
@@ -56,8 +56,8 @@ class WeatherViewModel : ViewModel() {
                 DataState.Data(
                     WeatherInfo(
                         Day("Thursday", 24),
-                        CanRide.MAYBE,
-                        WeatherIssue.SNOW,
+                        CanRide.NO,
+                        WeatherIssue.RAIN,
                         -5
                     )
                 )
@@ -65,16 +65,17 @@ class WeatherViewModel : ViewModel() {
         }
 }
 
-data class Day(
-    val name: String,
-    val number: Int
-)
 
 data class WeatherInfo(
     val day: Day? = null,
     val canRide: CanRide,
     val weatherIssue: WeatherIssue,
     val temperature: Int
+)
+
+data class Day(
+    val name: String,
+    val number: Int
 )
 
 enum class CanRide {

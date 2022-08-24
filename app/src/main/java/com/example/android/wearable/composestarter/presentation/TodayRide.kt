@@ -60,7 +60,10 @@ fun WeatherIndicator(weatherInfo: WeatherInfo) {
             .background(color = weatherInfo.statusColor())
     ) {
         if (weatherInfo.weatherIssue != WeatherIssue.NONE) {
-            WeatherAnimation(weatherInfo.weatherIssue)
+            WeatherAnimation(
+                modifier = Modifier.fillMaxSize(),
+                weatherIssue = weatherInfo.weatherIssue
+            )
         }
         Text(
             modifier = Modifier
@@ -78,16 +81,7 @@ fun WeatherIndicator(weatherInfo: WeatherInfo) {
 
 @Composable
 fun TopText(text: String) {
-    if (LocalConfiguration.current.isScreenRound) {
-        CurvedLayout {
-            curvedRow {
-                curvedText(
-                    text = text,
-                    style = CurvedTextStyle()
-                )
-            }
-        }
-    } else {
+    if (!LocalConfiguration.current.isScreenRound) {
         Row(
             modifier = Modifier
                 .fillMaxSize(),
@@ -95,6 +89,15 @@ fun TopText(text: String) {
             horizontalArrangement = Arrangement.Center
         ) {
             Text(text)
+        }
+    } else {
+        CurvedLayout {
+            curvedRow {
+                curvedText(
+                    text = text,
+                    style = CurvedTextStyle()
+                )
+            }
         }
     }
 }

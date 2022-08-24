@@ -27,43 +27,49 @@ import kotlin.random.Random
 
 
 @Composable
-fun WeatherAnimation(weatherIssue: WeatherIssue) {
+fun WeatherAnimation(modifier: Modifier = Modifier, weatherIssue: WeatherIssue) {
     when (weatherIssue) {
         WeatherIssue.RAIN -> {
             FallingImageBackground(
                 numberOfDrops = 30,
-                imageId = R.drawable.ic_drop,
-                color = Color(0xFF4D8CFF)
+                imageId = R.drawable.ic_rain,
+                color = Color(0xFF4D8CFF),
+                modifier = modifier
             )
         }
         WeatherIssue.SNOW -> {
             FallingImageBackground(
                 numberOfDrops = 20,
                 imageId = R.drawable.ic_snow,
-                color = Color.White
+                color = Color.White,
+                modifier = modifier
             )
         }
         WeatherIssue.NONE -> {
             RotatingIcon(
                 imageId = R.drawable.ic_sun,
-                color = Color.Yellow
+                color = Color.Yellow,
+                modifier = modifier
             )
         }
     }
 }
 
 @Composable
-fun RotatingIcon(@DrawableRes imageId: Int, color: Color) {
-    val rotationMultiplier by rememberInfiniteTransition().animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(tween(2000, easing = LinearEasing))
-    )
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+fun RotatingIcon(@DrawableRes imageId: Int, color: Color, modifier: Modifier) {
+    val rotation by rememberInfiniteTransition()
+        .animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(4000, easing = LinearEasing)
+            )
+        )
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Icon(
             modifier = Modifier
                 .fillMaxSize(0.60f)
-                .rotate(rotationMultiplier),
+                .rotate(rotation),
             contentDescription = "Rotating sun icon",
             imageVector = ImageVector.vectorResource(id = imageId),
             tint = color
@@ -72,18 +78,18 @@ fun RotatingIcon(@DrawableRes imageId: Int, color: Color) {
 }
 
 @Composable
-fun FallingImageBackground(numberOfDrops: Int, imageId: Int, color: Color) {
+fun FallingImageBackground(numberOfDrops: Int, imageId: Int, color: Color, modifier: Modifier) {
     val vector = ImageVector.vectorResource(id = imageId)
     val painter = rememberVectorPainter(image = vector)
-    val animatedHeights: List<State<Float>> = buildList {
+    val heightAnimations: List<State<Float>> = buildList {
         repeat(numberOfDrops) {
             add(
                 rememberInfiniteTransition().animateFloat(
                     initialValue = -0.10f,
                     targetValue = 1f,
                     animationSpec = infiniteRepeatable(
-                        tween(1000, easing = EaseIn),
-                        RepeatMode.Restart,
+                        animation = tween(1000, easing = EaseIn),
+                        repeatMode = RepeatMode.Restart,
                         initialStartOffset = StartOffset(Random.nextInt(until = 1000))
                     )
                 )
@@ -91,13 +97,13 @@ fun FallingImageBackground(numberOfDrops: Int, imageId: Int, color: Color) {
         }
     }
     val xs: List<Float> = List(numberOfDrops) { Random.nextFloat() }
-    Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
+    Canvas(modifier = modifier.fillMaxSize(), onDraw = {
         repeat(numberOfDrops) { index ->
             drawFallingImage(
                 x = xs[index] * size.width,
                 painter = painter,
                 color = color,
-                height = animatedHeights[index]
+                heightAnimation = heightAnimations[index]
             )
         }
     })
@@ -107,10 +113,10 @@ fun DrawScope.drawFallingImage(
     x: Float,
     painter: Painter,
     color: Color,
-    height: State<Float>
+    heightAnimation: State<Float>
 ) {
-    val iconSize = (size.width / 5)
-    translate(x, (height.value * size.height)) {
+    val iconSize = (size.width / 8)
+    translate(x, heightAnimation.value * size.height) {
         with(painter) {
             draw(Size(iconSize, iconSize), colorFilter = ColorFilter.tint(color))
         }
