@@ -9,7 +9,6 @@ import androidx.wear.compose.material.FractionalThreshold
 import androidx.wear.compose.material.rememberSwipeableState
 import androidx.wear.compose.material.swipeable
 
-
 @OptIn(ExperimentalWearMaterialApi::class)
 fun Modifier.onSwipeDown(action: () -> Unit): Modifier = composed {
     val swipeableState = rememberSwipeableState(0)
@@ -25,7 +24,6 @@ fun Modifier.onSwipeDown(action: () -> Unit): Modifier = composed {
     )
 }
 
-
 @OptIn(ExperimentalWearMaterialApi::class)
 fun Modifier.onSwipeUp(action: () -> Unit): Modifier = composed {
     val swipeableState = rememberSwipeableState(0)
@@ -40,7 +38,6 @@ fun Modifier.onSwipeUp(action: () -> Unit): Modifier = composed {
         orientation = Orientation.Vertical
     )
 }
-
 
 val Color.Companion.DrabGreen: Color
     get() = Color(0xFF749551)

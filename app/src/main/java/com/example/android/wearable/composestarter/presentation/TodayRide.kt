@@ -28,10 +28,11 @@ import com.example.android.wearable.composestarter.presentation.ui.WeatherAnimat
 import com.example.android.wearable.composestarter.presentation.utils.onSwipeDown
 import com.example.android.wearable.composestarter.presentation.utils.statusColor
 
-
 @Composable
 fun TodayRide(navController: NavController, weatherViewModel: WeatherViewModel = viewModel()) {
-    val todayWeather: DataState<WeatherInfo> by weatherViewModel.todayWeather.collectAsState(initial = DataState.Loading())
+    val todayWeather: DataState<WeatherInfo> by weatherViewModel.todayWeather.collectAsState(
+        initial = DataState.Loading()
+    )
     Box(
         modifier = Modifier
             .fillMaxSize()

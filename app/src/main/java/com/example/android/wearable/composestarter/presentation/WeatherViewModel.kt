@@ -65,7 +65,6 @@ class WeatherViewModel : ViewModel() {
         }
 }
 
-
 data class WeatherInfo(
     val day: Day? = null,
     val canRide: CanRide,

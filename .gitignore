@@ -21,6 +21,7 @@ output.json
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
+.editorconfig
 
 # Keystore files
 *.jks

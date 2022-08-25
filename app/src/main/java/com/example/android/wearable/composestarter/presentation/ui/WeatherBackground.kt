@@ -25,7 +25,6 @@ import com.example.android.wearable.composestarter.R
 import com.example.android.wearable.composestarter.presentation.WeatherIssue
 import kotlin.random.Random
 
-
 @Composable
 fun WeatherAnimation(modifier: Modifier = Modifier, weatherIssue: WeatherIssue) {
     when (weatherIssue) {
