@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class WeatherViewModel : ViewModel() {
-    private val random = Random(5435432)
+    private val random = Random(System.currentTimeMillis())
 
     val nextDaysWeather: Flow<List<WeatherInfo>> = flow {
         val days = DayOfWeek.values().toList()
@@ -18,14 +18,14 @@ class WeatherViewModel : ViewModel() {
             days
                 .mapIndexed { index, dayOfWeek ->
                     val weatherIssue = listOf(
-                        WeatherIssue.RAIN,
+                        WeatherIssue.SNOW,
                         WeatherIssue.SNOW,
                         WeatherIssue.RAIN,
-                        WeatherIssue.SNOW,
+                        WeatherIssue.RAIN,
                         WeatherIssue.NONE
                     ).random(random)
                     val temperature = if (weatherIssue == WeatherIssue.SNOW) {
-                        Random.nextInt(-10, 5)
+                        Random.nextInt(-20, 5)
                     } else {
                         Random.nextInt(10, 25)
                     }
@@ -55,7 +55,7 @@ class WeatherViewModel : ViewModel() {
             emit(
                 DataState.Data(
                     WeatherInfo(
-                        Day("Thursday", 24),
+                        Day("Wednesday", 24),
                         CanRide.NO,
                         WeatherIssue.RAIN,
                         -5
